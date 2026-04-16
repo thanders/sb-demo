@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Builder
 @Entity
 @Data
@@ -14,9 +16,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_generator")
+    @SequenceGenerator(name = "order_generator", sequenceName = "ORDER_SEQ", allocationSize = 1)
     private Long id;
 
     private String productName;
-    private double price;
+    private BigDecimal price;
 }
