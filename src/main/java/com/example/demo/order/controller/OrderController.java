@@ -1,8 +1,8 @@
 package com.example.demo.order.controller;
 
-import com.example.demo.entity.Order;
-import com.example.demo.order.exception.ResourceNotFoundException;
-import com.example.demo.order.repository.OrderRepository;
+import com.example.demo.order.dto.OrderRequestDto;
+import com.example.demo.order.dto.OrderResponseDto;
+import com.example.demo.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,39 +12,35 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping
-    public Order create(@RequestBody Order order) {
-        return orderRepository.save(order);
+    public OrderResponseDto create(@RequestBody OrderRequestDto request) {
+        return orderService.create(request);
     }
 
     @GetMapping
-    public List<Order> getAll() {
-        return orderRepository.findAll();
+    public List<OrderResponseDto> getAll() {
+        return orderService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public OrderResponseDto getById(@PathVariable Long id) {
+        return orderService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public Order update(@PathVariable Long id, @RequestBody Order orderDetails) {
-        Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + id));
-
-        existingOrder.setProductName(orderDetails.getProductName());
-        existingOrder.setPrice(orderDetails.getPrice());
-
-        return orderRepository.save(existingOrder);
+    public OrderResponseDto update(@PathVariable Long id, @RequestBody OrderRequestDto request) {
+        return orderService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + id));
-
-        orderRepository.delete(existingOrder);
+        orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
